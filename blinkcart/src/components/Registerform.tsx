@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -34,7 +34,7 @@ export default function RegisterForm({ previousstep }: propType) {
     setMounted(true);
   }, []);
 
-  // ✅ Register Handler Function
+  // âœ… Register Handler Function
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
@@ -50,12 +50,12 @@ export default function RegisterForm({ previousstep }: propType) {
       });
 
       if (response.status === 201 || response.status === 200) {
-        console.log("Registration Successful:", response.data);
+        // console.log("Registration Successful:", response.data);
         // Successful hone par user ko login page ya dashboard bhejo
         // router.push("/login");
       }
     } catch (err:any) {
-      setError(err.response?.data?.message || "Something went wrong! ❌");
+      setError(err.response?.data?.message || "Something went wrong! âŒ");
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +66,7 @@ export default function RegisterForm({ previousstep }: propType) {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a1a] font-sans">
       
-      {/* ⬅️ BACK BUTTON */}
+      {/* â¬…ï¸ BACK BUTTON */}
       <motion.button
         whileHover={{ x: -5 }}
         onClick={() => previousstep(1)}
@@ -111,7 +111,7 @@ export default function RegisterForm({ previousstep }: propType) {
             <span className="text-2xl font-bold text-white tracking-tight">BlinkCart</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-          <p className="text-white/40 text-sm italic">Join the fresh revolution.. 🍃</p>
+          <p className="text-white/40 text-sm italic">Join the fresh revolution.. ðŸƒ</p>
         </div>
 
         {/* Show Error Message if any */}

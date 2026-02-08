@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import uploadOnCloudinary from "@/lib/cloudinary";
 import connectDB from "@/lib/db";
 import Grocery from "@/modals/grocery.model";
@@ -38,16 +38,16 @@ export async function POST(req: NextRequest) {
       image: imageUrl,
     });
 
-    // ✅ Hamesha object return karo
+    // âœ… Hamesha object return karo
     return NextResponse.json({ 
       success: true, 
-      message: "Grocery added successfully 🔥", 
+      message: "Grocery added successfully ðŸ”¥", 
       data: newGrocery 
     }, { status: 201 });
 
   } catch (error: any) {
     console.error("API Error:", error);
-    // ❌ Yahan galti ho rahi hogi, error.message ko JSON mein lapet kar bhejo
+    // âŒ Yahan galti ho rahi hogi, error.message ko JSON mein lapet kar bhejo
     return NextResponse.json({ 
       success: false, 
       message: "Server Error", 

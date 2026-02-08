@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 interface IOrder {
   user: mongoose.Types.ObjectId;
@@ -12,6 +12,7 @@ interface IOrder {
   }[];
   isPaid: boolean;
   totalAmount: number;
+  deliveryFee?: number;
   paymentMethod: "cod" | "upi" | "card";
   address: {
     fullname: string;
@@ -30,6 +31,7 @@ interface IOrder {
     | "delivered"
     | "cancelled"
     | "out for delivery";
+  assignment?: mongoose.Types.ObjectId;
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(
@@ -80,7 +82,16 @@ const orderSchema = new mongoose.Schema<IOrder>(
       ],
       default: "pending",
     },
+    assignment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryAssignment",
+      required: false,
+    },
     totalAmount: Number,
+    deliveryFee: {
+      type: Number,
+      default: 0,
+    },
     isPaid: {
       type: Boolean,
       default: false,

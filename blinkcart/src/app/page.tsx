@@ -1,4 +1,4 @@
-import { auth } from '@/auth'
+﻿import { auth } from '@/auth'
 import AdminDashboard from '@/components/AdminDashboard'
 import DeliveryBoy from '@/components/DeliveryBoy'
 import Editrolemobile from '@/components/Editrolemobile'
@@ -10,7 +10,7 @@ import User from '@/modals/user.model'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
-async function page() {
+async function page({ searchParams }: { searchParams?: { q?: string } }) {
   await connectDB()
   const session = await auth()
   
@@ -35,11 +35,13 @@ async function page() {
     return <Editrolemobile /> 
   }
 
+  const q = searchParams?.q ?? ""
+
   return (
     <>
-    <Nav user={user } /> 
-    {user.role=="user"?(<UserDashboard/>):user.role=="admin"?(<AdminDashboard/>):<DeliveryBoy/>}
-  </>
+      <Nav user={user } /> 
+      {user.role=="user"?(<UserDashboard search={q} />):user.role=="admin"?(<AdminDashboard/>):<DeliveryBoy/>}
+    </>
   )
 }
 export default page

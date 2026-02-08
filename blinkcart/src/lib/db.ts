@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 const mongodbURL=process.env.MONGODB_URL
 
@@ -23,7 +23,7 @@ const connectDB= async ()=>{
         const conn=await cached.promise
         return conn
     } catch (error) {
-        console.log("error")
+        // console.log("error")
     }
 }
 

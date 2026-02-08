@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { motion } from "framer-motion";
 import { 
   Apple, 
@@ -11,7 +11,7 @@ import {
   Citrus 
 } from "lucide-react";
 
-// 🎨 Color Opacity ko /10 se badha kar /25 kiya hai aur Glow add kiya hai
+// ðŸŽ¨ Color Opacity ko /10 se badha kar /25 kiya hai aur Glow add kiya hai
 const ICONS = [
   { Icon: Apple, top: "10%", left: "5%", size: 45, color: "text-red-500/25" },
   { Icon: Leaf, top: "20%", left: "80%", size: 55, color: "text-green-500/25" },

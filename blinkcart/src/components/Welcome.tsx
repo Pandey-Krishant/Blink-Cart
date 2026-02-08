@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -46,7 +46,7 @@ const Welcome = ({ nextstep }: propType) => {
     <AnimatePresence>
       <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a1a]">
         
-        {/* 🎭 BACKGROUND ICONS (Dark & Subtle) */}
+        {/* ðŸŽ­ BACKGROUND ICONS (Dark & Subtle) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
           <motion.div animate={{ y: [0, 40, 0], rotate: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity }} className="absolute top-[10%] left-[10%] text-red-500/40"><Apple size={100} /></motion.div>
           <motion.div animate={{ y: [0, -50, 0], rotate: [0, -15, 0] }} transition={{ duration: 10, repeat: Infinity }} className="absolute top-[20%] right-[15%] text-green-500/40"><Leaf size={120} /></motion.div>
@@ -141,7 +141,7 @@ const Welcome = ({ nextstep }: propType) => {
           transition={{ delay: 1, duration: 1 }}
           className="absolute bottom-10 text-white text-[10px] tracking-[6px] uppercase font-light"
         >
-          BlinkCart • 2026
+          BlinkCart â€¢ 2026
         </motion.div>
       </main>
     </AnimatePresence>

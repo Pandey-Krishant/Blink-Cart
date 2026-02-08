@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -8,7 +8,7 @@ import {
   Drumstick, Wind 
 } from "lucide-react";
 
-// ⚠️ DHAYAN DE: Agar file name "Backgroundicons.tsx" hai toh path sahi rakhna
+// âš ï¸ DHAYAN DE: Agar file name "Backgroundicons.tsx" hai toh path sahi rakhna
 import BackgroundIcons from "./Backgroundicons";
 
 const CATEGORIES = [

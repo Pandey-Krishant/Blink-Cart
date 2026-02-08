@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import User from "@/modals/user.model";
 import { NextRequest, NextResponse } from "next/server";
 

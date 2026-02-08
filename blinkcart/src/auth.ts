@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+﻿import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import connectDB from "./lib/db"
 import bcrypt from "bcryptjs"

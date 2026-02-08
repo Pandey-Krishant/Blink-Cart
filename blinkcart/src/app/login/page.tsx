@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -34,8 +34,8 @@ export default function LoginForm({ previousstep }: propType) {
     setMounted(true);
   }, []);
 
-  // ✅ Login Handler Logic
-// ✅ Proper NextAuth Credentials Login
+  // âœ… Login Handler Logic
+// âœ… Proper NextAuth Credentials Login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
@@ -47,21 +47,21 @@ export default function LoginForm({ previousstep }: propType) {
       const res = await signIn("credentials", {
         email,
         password,
-        redirect: false, // 👈 Ye zaroori hai taaki page reload na ho aur hum error handle kar sakein
+        redirect: false, // ðŸ‘ˆ Ye zaroori hai taaki page reload na ho aur hum error handle kar sakein
       });
 
       if (res?.error) {
         // Agar backend/NextAuth se koi error aaya (e.g., Wrong Password)
-        setError("Invalid credentials! ❌");
-        console.log("Auth Error:", res.error);
+        setError("Invalid credentials! âŒ");
+        // console.log("Auth Error:", res.error);
       } else {
         // Agar sab sahi hai
-        console.log("Login Successful! 🚀");
+        // console.log("Login Successful! ðŸš€");
         router.push("/"); // Ya jahan bhi bhejona ho
         router.refresh(); // Session update karne ke liye
       }
     } catch (error) {
-      setError("Something went wrong! ❌");
+      setError("Something went wrong! âŒ");
       console.error("Login Exception:", error);
     } finally {
       setIsLoading(false);
@@ -73,7 +73,7 @@ export default function LoginForm({ previousstep }: propType) {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a1a] font-sans">
       
-      {/* ⬅️ BACK BUTTON */}
+      {/* â¬…ï¸ BACK BUTTON */}
       <motion.button
         whileHover={{ x: -5 }}
         onClick={() => previousstep(1)} // Welcome page par back
@@ -117,7 +117,7 @@ export default function LoginForm({ previousstep }: propType) {
             <span className="text-2xl font-bold text-white tracking-tight">BlinkCart</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">Welcome Back!</h2>
-          <p className="text-white/40 text-sm italic">Great to see you again.. 🍃</p>
+          <p className="text-white/40 text-sm italic">Great to see you again.. ðŸƒ</p>
         </div>
 
         {error && (

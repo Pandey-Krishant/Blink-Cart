@@ -1,11 +1,12 @@
-import React from 'react'
+﻿import React from 'react'
 import Herosection from './Herosection'
 import CategorySLider from './CategorySLider'
 import connectDB from '@/lib/db'
 import Grocery from '@/modals/grocery.model'
 import Grocerycard from './Grocerycard'
+import ScrollToMatch from './ScrollToMatch'
 
-async function UserDashboard() {
+async function UserDashboard({ search = "" }: { search?: string }) {
   await connectDB();
   
   // 1. Data fetch karo
@@ -19,9 +20,18 @@ async function UserDashboard() {
     updatedAt: doc.updatedAt?.toString(),
   }));
 
+  const query = (search || "").trim().toLowerCase();
+  const matchesQuery = (item: any) =>
+    String(item.name || "").toLowerCase().includes(query) ||
+    String(item.category || "").toLowerCase().includes(query);
+
+  const filtered = query ? grocery.filter((item: any) => matchesQuery(item)) : grocery;
+  const firstMatchId = query && filtered.length > 0 ? String(filtered[0]._id) : "";
+
   return (
     <>
       <Herosection />
+      <ScrollToMatch query={query} />
       <CategorySLider />
 
       <div className="relative z-20 max-w-[1400px] mx-auto px-10 py-20">
@@ -29,10 +39,15 @@ async function UserDashboard() {
   FRESH <span className="text-blue-500">STUFF</span>
 </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {grocery.length > 0 ? (
-            grocery.map((item: any) => (
+          {filtered.length > 0 ? (
+            filtered.map((item: any) => (
               // Ab yahan item._id ek simple string hai, toh koi tension nahi
-              <Grocerycard key={item._id} item={item} />
+              <Grocerycard
+                key={item._id}
+                item={item}
+                highlight={query ? matchesQuery(item) : false}
+                dataSearchMatch={firstMatchId === String(item._id)}
+              />
             ))
           ) : (
             <p className="text-white/50 col-span-full text-center py-10">

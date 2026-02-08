@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
@@ -27,7 +27,7 @@ const Unauthorized = () => {
   return (
     <div className="min-h-screen bg-[#050510] flex items-center justify-center relative overflow-hidden px-4">
       
-      {/* 🌌 Animated Background Glows */}
+      {/* ðŸŒŒ Animated Background Glows */}
       <motion.div 
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity }}
@@ -39,7 +39,7 @@ const Unauthorized = () => {
         className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" 
       />
 
-      {/* 🍎 Floating Background Icons */}
+      {/* ðŸŽ Floating Background Icons */}
       {bgIcons.map((item, index) => (
         <motion.div
           key={index}
@@ -54,7 +54,7 @@ const Unauthorized = () => {
       ))}
 
       <div className="relative z-10 w-full max-w-lg">
-        {/* 💎 Premium Glass Card */}
+        {/* ðŸ’Ž Premium Glass Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -65,7 +65,7 @@ const Unauthorized = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
           
           <div className="relative mb-10 flex justify-center">
-            {/* 🛡️ Central Icon with Glow */}
+            {/* ðŸ›¡ï¸ Central Icon with Glow */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -88,7 +88,7 @@ const Unauthorized = () => {
              </p>
           </div>
 
-          {/* 🕹️ Navigation Actions */}
+          {/* ðŸ•¹ï¸ Navigation Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link href="/" className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-4 rounded-2xl font-bold transition-all active:scale-95">
               <ArrowLeft size={18} />
@@ -101,7 +101,7 @@ const Unauthorized = () => {
           </div>
         </motion.div>
 
-        {/* 🏷️ Bottom Security Badge */}
+        {/* ðŸ·ï¸ Bottom Security Badge */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

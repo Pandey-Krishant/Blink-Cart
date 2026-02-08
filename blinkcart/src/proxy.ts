@@ -1,4 +1,4 @@
-import { getToken } from "next-auth/jwt";
+﻿import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import User from "@/modals/user.model";
@@ -6,15 +6,15 @@ import User from "@/modals/user.model";
 export async function proxy(req:NextRequest){
     
     const {pathname}=req.nextUrl
-    const publicRoutes=["/login","/register","/api/auth"]
+    const publicRoutes=["/login","/register","/api/auth","/api/socket/connect","/api/socket/updatelocation"]
     if(publicRoutes.some((path)=>pathname.startsWith(path))){
         return NextResponse.next()
     }
     const token=await getToken({req,secret:process.env.AUTH_SECRET})
-    console.log(token)
+    // console.log(token)
     if(!token){
         const loginUrl=new URL("/login",req.url)
-        console.log(loginUrl)
+        // console.log(loginUrl)
         loginUrl.searchParams.set("callbackUrl",req.url)
         return NextResponse.redirect(loginUrl)
     }
@@ -28,7 +28,7 @@ export async function proxy(req:NextRequest){
         // if DB fails, fall back to token role
         console.error("proxy role DB lookup failed:", err)
     }
-    if(pathname.startsWith("/user")&& role!=="user"){
+    if(pathname.startsWith("/user")&& role!=="user" && pathname !== "/user/delivered"){
         return NextResponse.redirect(new URL("/unauthorized",req.url))
     }
        if(pathname.startsWith("/delivery")&& role!=="deliveryBoy"){
@@ -47,6 +47,6 @@ export async function proxy(req:NextRequest){
 export const config={
    matcher: [
     // Webhook ko ignore karne ke liye exclusion daalo
-    '/((?!api/user/stripe/webhook|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/user/stripe/webhook|api/socket/connect|api/socket/updatelocation|_next/static|_next/image|favicon.ico).*)',
   ],
 }

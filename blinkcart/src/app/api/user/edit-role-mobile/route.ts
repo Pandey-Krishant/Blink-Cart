@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import connectDB from "@/lib/db";
 import User from "@/modals/user.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
       { role, mobile },
-      { new: true } // 🔥 Ye zaroori hai update ke baad wala data lene ke liye
+      { new: true } // ðŸ”¥ Ye zaroori hai update ke baad wala data lene ke liye
     );
 
     // 4. Check if user exists
@@ -37,16 +37,16 @@ export async function POST(req: NextRequest) {
     // 5. Success Response
     return NextResponse.json(
       { 
-        message: "Profile Updated Successfully! 🚀", 
+        message: "Profile Updated Successfully! ðŸš€", 
         user: updatedUser 
       },
       { status: 200 }
     );
 
   } catch (error) {
-    console.log("Update Error:", error);
+    // console.log("Update Error:", error);
     return NextResponse.json(
-      { message: "Internal Server Error! 💥" },
+      { message: "Internal Server Error! ðŸ’¥" },
       { status: 500 }
     );
   }

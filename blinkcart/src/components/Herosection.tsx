@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +28,7 @@ const slides = [
   },
   {
     id: 4,
-    // 🔥 New Premium Bakery/Dairy Image
+    // ðŸ”¥ New Premium Bakery/Dairy Image
     image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072&auto=format&fit=crop", 
     title: "Dairy & Bakery Fresh",
     subtitle: "Start your morning with freshly baked bread and pure milk",
@@ -62,7 +62,7 @@ const Herosection = () => {
             transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
             className="relative w-full h-full rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl"
           >
-            {/* 🖼️ Image Layer */}
+            {/* ðŸ–¼ï¸ Image Layer */}
             <div 
               className="absolute inset-0 bg-cover bg-center transition-transform duration-[2000ms] group-hover:scale-105"
               style={{ backgroundImage: `url(${slides[current].image})` }}
@@ -71,7 +71,7 @@ const Herosection = () => {
               <div className={`absolute inset-0 bg-gradient-to-r ${slides[current].color}/30 via-[#0a0a1a]/60 to-[#0a0a1a]/90`} />
             </div>
 
-            {/* 📝 Content Layer */}
+            {/* ðŸ“ Content Layer */}
             <div className="relative h-full z-10 flex flex-col justify-center px-8 md:px-16 max-w-2xl">
               <motion.span
                 initial={{ x: -20, opacity: 0 }}
@@ -115,7 +115,7 @@ const Herosection = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* 🕹️ Navigation Buttons */}
+        {/* ðŸ•¹ï¸ Navigation Buttons */}
         <div className="absolute inset-0 flex items-center justify-between px-6 z-20 pointer-events-none">
           <button 
             onClick={prevSlide}
@@ -131,7 +131,7 @@ const Herosection = () => {
           </button>
         </div>
 
-        {/* ⏺️ Indicators */}
+        {/* âºï¸ Indicators */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-20">
           {slides.map((_, index) => (
             <button

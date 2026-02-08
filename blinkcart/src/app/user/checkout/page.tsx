@@ -1,11 +1,11 @@
-"use client";
-import React, { useState, useEffect, useCallback } from 'react';
+﻿"use client";
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import axios from 'axios';
 import { 
   ChevronLeft, MapPin, User, Phone as PhoneIcon, 
-  Smartphone, CreditCard, Truck 
+  Smartphone, CreditCard, Truck, Crosshair 
 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -26,13 +26,101 @@ function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState({
     city: "",
+    state: "",
     pincode: "",
     fullAddress: ""
   });
+  const [coords, setCoords] = useState<{ lat: number | null; lng: number | null }>({
+    lat: null,
+    lng: null,
+  });
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+  const [originCoords, setOriginCoords] = useState<[number, number] | null>(null);
+  const [locationError, setLocationError] = useState<string>("");
+  const didAutoLocateRef = useRef(false);
+  const desiredAccuracyMeters = 150;
+  // Increase geolocation timeout to 30 seconds for slower devices/permissions
+  const maxWaitMs = 30000;
 
   const subtotal = cartData.reduce((acc, item) => acc + (Number(item.price) * item.quantity), 0);
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + deliveryFee;
+
+  const getBestPosition = useCallback((): Promise<GeolocationPosition> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation not supported"));
+        return;
+      }
+      let best: GeolocationPosition | null = null;
+      let settled = false;
+      let watchId = 0;
+      let timer: ReturnType<typeof setTimeout> | null = null;
+
+      const finish = (pos?: GeolocationPosition, err?: any) => {
+        if (settled) return;
+        settled = true;
+        navigator.geolocation.clearWatch(watchId);
+        if (timer) clearTimeout(timer);
+        if (pos) resolve(pos);
+        else reject(err || new Error("Unable to fetch current location."));
+      };
+
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || (latitude === 0 && longitude === 0)) return;
+          if (!best || (accuracy ?? Infinity) < (best.coords.accuracy ?? Infinity)) best = pos;
+          if ((accuracy ?? Infinity) <= desiredAccuracyMeters) finish(pos);
+        },
+        (err) => {
+          if (best) finish(best);
+          else finish(undefined, err);
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: maxWaitMs }
+      );
+
+      timer = setTimeout(() => {
+        if (best) finish(best);
+        else finish(undefined, new Error("Unable to fetch current location."));
+      }, maxWaitMs + 500);
+    });
+  }, [desiredAccuracyMeters, maxWaitMs]);
+
+  const resolveCoords = async () => {
+    if (Number.isFinite(coords.lat) && Number.isFinite(coords.lng)) return { lat: coords.lat as number, lng: coords.lng as number };
+    const query = [address.fullAddress, address.city, address.state, address.pincode].filter(Boolean).join(", ");
+    if (query) {
+      try {
+        const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+          params: { format: "json", q: query }
+        });
+        const first = Array.isArray(response.data) ? response.data[0] : null;
+        const lat = Number(first?.lat);
+        const lng = Number(first?.lon);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          setCoords({ lat, lng });
+          return { lat, lng };
+        }
+      } catch (err) {
+        console.error("Geocoding Error:", err);
+      }
+    }
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      try {
+        const pos = await getBestPosition();
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        if (Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0)) {
+          setCoords({ lat, lng });
+          return { lat, lng };
+        }
+      } catch (err) {
+        console.warn("Geo fallback failed:", err);
+      }
+    }
+    return null;
+  };
 
   // --- Main Logic Starts Here ---
   const handleConfirmOrder = async () => {
@@ -43,6 +131,12 @@ function CheckoutPage() {
     try {
       setLoading(true);
       
+      const resolved = await resolveCoords();
+      if (!resolved) {
+        alert("Unable to resolve delivery coordinates. Please set location on map or use current location.");
+        setLoading(false);
+        return;
+      }
       const orderPayload = {
         userId: userData._id,
         items: cartData.map(item => ({
@@ -57,21 +151,22 @@ function CheckoutPage() {
         address: {
           fullname: userData.name || "Customer",
           city: address.city,
-          state: "Delhi", 
+          state: address.state || "Delhi", 
           mobile: userData.mobile || "0000000000",
           pincode: address.pincode,
           fullAddress: address.fullAddress,
-          latitude: "0",
-          longitude: "0"
+          latitude: String(resolved.lat),
+          longitude: String(resolved.lng)
         },
-        totalAmount: total
+        totalAmount: total,
+        deliveryFee
       };
 
-      // ✅ Response handle karne ka sahi tarika
+      // âœ… Response handle karne ka sahi tarika
       const response = await axios.post('/api/user/paymentstripe', orderPayload);
       const data = response.data;
 
-      // 🚨 STRIPE REDIRECT logic
+      // ðŸš¨ STRIPE REDIRECT logic
       if (paymentMethod === 'card' && data.url) {
           window.location.href = data.url; // Assign ki jagah .href zyada reliable hai
           return;
@@ -92,14 +187,18 @@ function CheckoutPage() {
   };
 
   const handleLocationChange = useCallback(async (lat: number, lon: number) => {
+    setCoords({ lat, lng: lon });
+    setLocationError("");
+    if (!originCoords) setOriginCoords([lat, lon]);
     try {
       const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
-        params: { format: 'json', lat, lon, addressdetails: 1 }
+        params: { format: 'json', lat, lon, addressdetails: 1, zoom: 18 }
       });
       const data = response.data;
       if (data && data.address) {
         setAddress({
           city: data.address.city || data.address.suburb || data.address.town || "",
+          state: data.address.state || "",
           pincode: data.address.postcode || "",
           fullAddress: data.display_name || ""
         });
@@ -107,15 +206,49 @@ function CheckoutPage() {
     } catch (err) {
       console.error("Geocoding Error:", err);
     }
-  }, []);
+  }, [originCoords]);
+
+  const handleUseCurrentLocation = useCallback(async () => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+    if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+      setLocationError("Location requires HTTPS (or localhost).");
+      return;
+    }
+    try {
+      const pos = await getBestPosition();
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      const acc = pos.coords.accuracy ?? 0;
+      if (acc && acc > 3000) {
+        setLocationError(`Location accuracy is low (${Math.round(acc)}m). Enable precise location or adjust the pin.`);
+      } else {
+        setLocationError("");
+      }
+      setMapCenter([lat, lng]);
+      if (!originCoords) setOriginCoords([lat, lng]);
+      await handleLocationChange(lat, lng);
+    } catch (err) {
+      console.warn("Geo error:", err);
+      const message = (err as any)?.message || "Unable to fetch current location.";
+      setLocationError(message);
+    }
+  }, [getBestPosition, handleLocationChange, originCoords]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        handleLocationChange(pos.coords.latitude, pos.coords.longitude);
-      }, (err) => console.log("Geo error:", err));
-    }
-  }, [handleLocationChange]);
+    if (didAutoLocateRef.current) return;
+    didAutoLocateRef.current = true;
+    handleUseCurrentLocation();
+  }, [handleUseCurrentLocation]);
+
+  const handleRecenterOriginal = async () => {
+    if (!originCoords) return;
+    const [lat, lng] = originCoords;
+    setMapCenter([lat, lng]);
+    await handleLocationChange(lat, lng);
+  };
+
+  // Initial location is handled by MapComponent for faster updates
 
   return (
     <div className="min-h-screen bg-[#0b0b1a] text-white p-6 md:p-12 relative overflow-hidden">
@@ -167,13 +300,40 @@ function CheckoutPage() {
                   <input type="text" placeholder="City" value={address.city} onChange={(e) => setAddress({...address, city: e.target.value})} className="w-full bg-white/[0.05] border border-white/10 rounded-2xl py-4 px-6 outline-none focus:border-blue-500/30" />
                 </div>
                 <div className="space-y-2">
+                  <input type="text" placeholder="State" value={address.state} onChange={(e) => setAddress({...address, state: e.target.value})} className="w-full bg-white/[0.05] border border-white/10 rounded-2xl py-4 px-6 outline-none focus:border-blue-500/30" />
+                </div>
+                <div className="space-y-2">
                   <input type="text" placeholder="Pincode" value={address.pincode} onChange={(e) => setAddress({...address, pincode: e.target.value})} className="w-full bg-white/[0.05] border border-white/10 rounded-2xl py-4 px-6 outline-none focus:border-blue-500/30" />
                 </div>
 
                 <div className="md:col-span-2 mt-4">
-                   <div className="h-80 w-full rounded-3xl overflow-hidden border border-white/10 shadow-inner">
-                      <MapComponent onLocationChange={handleLocationChange} />
+                   <div className="h-80 w-full rounded-3xl overflow-hidden border border-white/10 shadow-inner relative">
+                     <MapComponent onLocationChange={handleLocationChange} forcedPosition={mapCenter} enableWatch={true} />
+                      <div className="absolute right-4 top-4 z-[5] flex flex-col gap-2">
+                        <button
+                          type="button"
+                          onClick={handleUseCurrentLocation}
+                          className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white/70 hover:text-blue-400 hover:border-blue-500/40 transition-all"
+                          title="Use current location"
+                        >
+                          <Crosshair size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRecenterOriginal}
+                          className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white/70 hover:text-blue-400 hover:border-blue-500/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                          title="Recenter to original location"
+                          disabled={!originCoords}
+                        >
+                          <MapPin size={16} />
+                        </button>
+                      </div>
                    </div>
+                   {locationError && (
+                     <p className="mt-3 text-[10px] uppercase tracking-widest text-red-400/90">
+                       {locationError}
+                     </p>
+                   )}
                 </div>
               </div>
             </div>
@@ -205,11 +365,11 @@ function CheckoutPage() {
               </div>
 
               <div className="mt-10 pt-8 border-t border-white/5 space-y-4">
-                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Subtotal</span><span>₹{subtotal}</span></div>
-                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Delivery</span><span>₹{deliveryFee}</span></div>
+                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Subtotal</span><span>â‚¹{subtotal}</span></div>
+                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Delivery</span><span>â‚¹{deliveryFee}</span></div>
                 <div className="flex justify-between items-end pt-4">
                   <span className="text-[10px] font-black text-blue-500 italic uppercase">GRAND TOTAL</span>
-                  <span className="text-3xl font-black tracking-tighter text-white">₹{total}</span>
+                  <span className="text-3xl font-black tracking-tighter text-white">â‚¹{total}</span>
                 </div>
                 
                 <button 

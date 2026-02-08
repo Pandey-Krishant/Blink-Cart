@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import mongoose from "mongoose";
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useSelector } from "react-redux";
+import { useRouter, useSearchParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 
 interface IUser {
@@ -24,6 +25,9 @@ interface IUser {
 function Nav({ user }: { user: IUser }) {
   const cartData = useSelector((state: RootState) => state.cart.cartData || []);
   const uniqueItemsCount = cartData.length;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchText, setSearchText] = useState("");
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -39,6 +43,28 @@ function Nav({ user }: { user: IUser }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const q = searchParams?.get("q") || "";
+    setSearchText(q);
+  }, [searchParams]);
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    if (isAdmin) return;
+    const handle = setTimeout(() => {
+      const q = searchText.trim();
+      if (!q) {
+        router.replace("/");
+        return;
+      }
+      router.replace(`/?q=${encodeURIComponent(q)}`);
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [searchText, router, isAdmin]);
 
   return (
     <>
@@ -80,10 +106,16 @@ function Nav({ user }: { user: IUser }) {
                   </Link>
                 </>
               ) : (
-                <div className="flex-1 max-w-sm relative group">
-                  <input type="text" placeholder="Search items..." className="w-full bg-white/[0.05] border border-white/10 rounded-[1.5rem] py-2.5 pl-12 pr-4 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-all text-sm" />
+                <form onSubmit={submitSearch} className="flex-1 max-w-sm relative group">
+                  <input
+                    type="text"
+                    placeholder="Search items..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-[1.5rem] py-2.5 pl-12 pr-4 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-all text-sm"
+                  />
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-blue-500" size={18} />
-                </div>
+                </form>
               )}
             </div>
 
@@ -119,7 +151,7 @@ function Nav({ user }: { user: IUser }) {
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 15 }} className="absolute right-0 mt-4 w-56 bg-[#0d0d21]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-3 shadow-2xl z-[110]">
                       <div className="p-4 mb-2 border-b border-white/5">
                         <p className="text-white font-bold text-sm truncate">{user?.name}</p>
-                        {/* 🔥 Bolder Email in Dropdown */}
+                        {/* ðŸ”¥ Bolder Email in Dropdown */}
                         <p className="text-white/70 text-[10px] truncate mb-1 font-bold">{user?.email}</p>
                         <p className="text-blue-500 text-[9px] uppercase font-black tracking-widest">{user?.role}</p>
                       </div>
@@ -155,7 +187,7 @@ function Nav({ user }: { user: IUser }) {
                 <button onClick={() => setIsSidebarOpen(false)} className="p-2 bg-white/5 rounded-xl text-white/50"><X size={20}/></button>
               </div>
 
-              {/* 🔥 User Info in Sidebar (Mobile View) */}
+              {/* ðŸ”¥ User Info in Sidebar (Mobile View) */}
               <div className="mb-10 p-5 bg-white/[0.03] border border-white/10 rounded-[2rem] flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden bg-blue-500/20 flex items-center justify-center border border-blue-500/30 mb-4 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                   {user?.image ? <img src={user.image} alt="User" className="w-full h-full object-cover" /> : <UserIcon size={30} className="text-blue-400" />}
@@ -173,13 +205,13 @@ function Nav({ user }: { user: IUser }) {
                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest pl-2">Admin Actions</p>
                     <Link href="/admin/grocery-add" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><PlusCircle size={20} className="text-blue-500"/> Add Grocery</Link>
                     <Link href="/admin/view-grocery" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><LayoutDashboard size={20} className="text-blue-500"/> View Grocery</Link>
-                    <Link href="/admin/manage-grocery" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><Settings2 size={20} className="text-blue-500"/> Manage</Link>
+                    <Link href="/admin/managegrocery" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><Settings2 size={20} className="text-blue-500"/> Manage</Link>
                   </>
                 ) : (
                   <>
                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest pl-2">Main Menu</p>
                     <Link href="/" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><Home size={20} className="text-blue-500"/> Home</Link>
-                    <Link href="/user/myorders" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><History size={20} className="text-blue-500"/> My Orders</Link>
+                    <Link href="/user/myorder" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><History size={20} className="text-blue-500"/> My Orders</Link>
                     <Link href="/user/cart" className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl text-sm font-bold border border-white/5 hover:border-blue-500/30 transition-all"><ShoppingCart size={20} className="text-blue-500"/> My Cart</Link>
                   </>
                 )}

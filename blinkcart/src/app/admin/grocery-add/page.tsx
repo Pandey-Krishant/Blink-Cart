@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, ChangeEvent, useRef } from "react"; // 1. useRef add kiya
 import { motion } from "framer-motion";
@@ -61,10 +61,10 @@ export default function AddGrocery() {
       });
 
       if (response.status === 201 || response.status === 200) {
-        // ✅ Success Toast
-        toast.success("Mubarak ho! Grocery add ho gayi 🔥", { id: toastId });
+        // âœ… Success Toast
+        toast.success("Mubarak ho! Grocery add ho gayi ðŸ”¥", { id: toastId });
 
-        // 🧼 FORM RESET LOGIC (SAB KHALI)
+        // ðŸ§¼ FORM RESET LOGIC (SAB KHALI)
         formRef.current?.reset(); // Inputs khali
         setPreview(null);         // Image preview khatam
         setSelectedCategory("");  // Category button reset
@@ -157,7 +157,7 @@ export default function AddGrocery() {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-3">
-                <label className="text-[11px] font-black uppercase text-gray-400">Price (₹)</label>
+                <label className="text-[11px] font-black uppercase text-gray-400">Price (â‚¹)</label>
                 <div className="relative">
                   <IndianRupee className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600" size={20} />
                   <input name="price" required type="number" placeholder="80" className="w-full bg-white/[0.05] border border-white/10 py-5 pl-14 pr-4 rounded-3xl outline-none focus:border-blue-500 text-white" />

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import mongoose from 'mongoose'
 
 interface IGrocery {
@@ -41,7 +41,7 @@ const cartSlice = createSlice({
         item.quantity = item.quantity + 1
       }
     },
-    // 🔥 Bas ye decrement add kiya hai bro
+    // ðŸ”¥ Bas ye decrement add kiya hai bro
     decrement: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
       const item = state.cartData.find(i => i._id == action.payload)
       if (item) {

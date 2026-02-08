@@ -1,4 +1,4 @@
-"use client"; // Animation ke liye client component zaruri hai
+﻿"use client"; // Animation ke liye client component zaruri hai
 
 import { motion } from "framer-motion";
 import {
@@ -55,13 +55,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-[#0a0a1a] text-white min-h-screen relative overflow-x-hidden antialiased">
-        {/* 🌌 Animated Background Layer */}
+        {/* ðŸŒŒ Animated Background Layer */}
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-          {/* 🌈 Primary Glows */}
+          {/* ðŸŒˆ Primary Glows */}
           <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/15 blur-[120px] rounded-full" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/15 blur-[150px] rounded-full" />
 
-          {/* 🍎 Animated Colorful Icons */}
+          {/* ðŸŽ Animated Colorful Icons */}
           <FloatingIcon
             icon={Apple}
             top="10%"
@@ -136,12 +136,15 @@ export default function RootLayout({
           />
         </div>
 
-        {/* 📄 Content Layer */}
-        <div className="relative z-10">
+        {/* ðŸ“„ Content Layer */}
+        <div className="relative z-10 min-h-screen flex flex-col">
           <Provider>
             <StoreProvider>
               <InitUser />
-              {children}
+              <div className="flex-1">{children}</div>
+              <footer className="mt-16 px-4 pb-10 text-center text-white/30 text-[10px] uppercase font-black tracking-[0.4em]">
+                BlinkCart â€¢ Built For Speed â€¢ Developer~Krishant Pandey
+              </footer>
             </StoreProvider>
           </Provider>
         </div>

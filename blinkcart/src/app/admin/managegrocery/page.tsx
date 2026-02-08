@@ -1,21 +1,106 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Package, Search, Clock, CheckCircle2, Truck, 
-  AlertCircle, Eye, RefreshCcw, X, MapPin, User, ShoppingBag, CreditCard, Phone
+import {
+  Package,
+  Search,
+  Clock,
+  CheckCircle2,
+  Truck,
+  AlertCircle,
+  Eye,
+  RefreshCcw,
+  X,
+  MapPin,
+  User,
+  ShoppingBag,
+  CreditCard,
+  Phone,
+  type LucideIcon,
 } from "lucide-react";
 import axios from "axios";
 import BackgroundIcons from "@/components/Backgroundicons";
+import { getSocket } from "@/lib/socket";
+
+const allStatuses = [
+  "pending",
+  "confirmed",
+  "shipped",
+  "out for delivery",
+  "delivered",
+  "cancelled",
+] as const;
+
+type OrderStatus = (typeof allStatuses)[number];
+
+type Address = {
+  fullname: string;
+  mobile: string;
+  fullAddress: string;
+  city: string;
+  state: string;
+  pincode: string;
+};
+
+type OrderItem = {
+  image: string;
+  name: string;
+  quantity: number;
+  price: number | string;
+};
+
+type AssignedUser = {
+  _id?: string;
+  name?: string;
+  mobile?: string;
+};
+
+type Assignment = {
+  _id?: string;
+  status?: string;
+  assignedTo?: AssignedUser | string | null;
+};
+
+type Order = {
+  _id: string;
+  status?: OrderStatus;
+  address?: Address;
+  items?: OrderItem[];
+  paymentMethod: string;
+  isPaid: boolean;
+  totalAmount: number;
+  assignment?: Assignment | string | null;
+};
+
+type DeliveryBoy = unknown;
+
+type UpdateStatusResponse = {
+  availableBoys?: DeliveryBoy[];
+};
 
 // Status Colors and Icons
-const statusConfig: any = {
+const statusConfig: Record<
+  OrderStatus,
+  { color: string; bg: string; icon: LucideIcon }
+> = {
   pending: { color: "text-yellow-400", bg: "bg-yellow-400/10", icon: Clock },
-  confirmed: { color: "text-purple-400", bg: "bg-purple-400/10", icon: Package },
+  confirmed: {
+    color: "text-purple-400",
+    bg: "bg-purple-400/10",
+    icon: Package,
+  },
   shipped: { color: "text-blue-400", bg: "bg-blue-400/10", icon: Truck },
-  "out for delivery": { color: "text-orange-400", bg: "bg-orange-400/10", icon: Truck },
-  delivered: { color: "text-green-400", bg: "bg-green-400/10", icon: CheckCircle2 },
+  "out for delivery": {
+    color: "text-orange-400",
+    bg: "bg-orange-400/10",
+    icon: Truck,
+  },
+  delivered: {
+    color: "text-green-400",
+    bg: "bg-green-400/10",
+    icon: CheckCircle2,
+  },
   cancelled: { color: "text-red-400", bg: "bg-red-400/10", icon: AlertCircle },
 };
 
@@ -29,22 +114,20 @@ const avatarColors = [
   "bg-rose-500/20 text-rose-400 border-rose-500/20",
 ];
 
-const allStatuses = ["pending", "confirmed", "shipped", "out for delivery", "delivered", "cancelled"];
-
 export default function ManageOrders() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updating, setUpdating] = useState(false);
-  const [availableBoys, setAvailableBoys] = useState<any[]>([]);
+  const [, setAvailableBoys] = useState<DeliveryBoy[]>([]);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/admin/managegrocery");
+      const res = await axios.get<Order[]>("/api/admin/managegrocery");
       setOrders(res.data);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Order fetching error:", err);
     } finally {
       setLoading(false);
@@ -54,11 +137,20 @@ export default function ManageOrders() {
   const updateStatus = async (orderId: string, newStatus: string) => {
     setUpdating(true);
     try {
-      const { data } = await axios.post(`/api/admin/updateorderstatus/${orderId}`, { status: newStatus });
+      const { data } = await axios.post<UpdateStatusResponse>(
+        `/api/admin/updateorderstatus/${orderId}`,
+        { status: newStatus }
+      );
 
       // update local state so UI reflects change without reload
-      setOrders((prev: any) => prev.map((o: any) => o._id === orderId ? { ...o, status: newStatus } : o));
-      setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === orderId ? { ...o, status: newStatus as OrderStatus } : o
+        )
+      );
+      setSelectedOrder((prev) =>
+        prev ? { ...prev, status: newStatus as OrderStatus } : prev
+      );
 
       // if backend returned available delivery boys, store them for UI
       if (data?.availableBoys) {
@@ -66,8 +158,8 @@ export default function ManageOrders() {
       } else {
         setAvailableBoys([]);
       }
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to update status");
+    } catch {
+      alert("Failed to update status");
     } finally {
       setUpdating(false);
     }
@@ -75,11 +167,87 @@ export default function ManageOrders() {
 
   useEffect(() => { fetchOrders(); }, []);
 
-  const filteredOrders = orders.filter((order: any) => 
-    order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredOrders = orders.filter((order: Order) => 
+    String(order._id).toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.address?.fullname?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  useEffect(() => {
+    const socket = getSocket();
+
+    const handleNewOrder = (newOrder: Order) => {
+      // console.log("[managegrocery] new-Order received", newOrder);
+      const normalized: Order = {
+        ...newOrder,
+        _id: String(newOrder._id),
+      };
+      setOrders((prev) => {
+        const list = prev ?? [];
+        const exists = list.some((o) => String(o._id) === normalized._id);
+        if (exists) {
+          return list.map((o) =>
+            String(o._id) === normalized._id ? normalized : o
+          );
+        }
+        return [normalized, ...list];
+      });
+    };
+
+    const handleStatusUpdate = (payload: {
+      orderId: string;
+      status: OrderStatus;
+      order?: Order;
+    }) => {
+      if (!payload?.orderId) return;
+      setOrders((prev) =>
+        (prev ?? []).map((o) =>
+          String(o._id) === String(payload.orderId)
+            ? { ...o, ...(payload.order ?? {}), status: payload.status }
+            : o
+        )
+      );
+      setSelectedOrder((prev) =>
+        prev && String(prev._id) === String(payload.orderId)
+          ? { ...prev, ...(payload.order ?? {}), status: payload.status }
+          : prev
+      );
+    };
+
+    const handleAssignmentAccepted = (payload: {
+      orderId: string;
+      assignmentId: string;
+      status?: string;
+      assignedTo?: AssignedUser | null;
+    }) => {
+      if (!payload?.orderId) return;
+      const assignment: Assignment = {
+        _id: payload.assignmentId,
+        status: payload.status,
+        assignedTo: payload.assignedTo ?? null,
+      };
+      setOrders((prev) =>
+        (prev ?? []).map((o) =>
+          String(o._id) === String(payload.orderId)
+            ? { ...o, assignment }
+            : o
+        )
+      );
+      setSelectedOrder((prev) =>
+        prev && String(prev._id) === String(payload.orderId)
+          ? { ...prev, assignment }
+          : prev
+      );
+    };
+
+    socket?.on("new-Order", handleNewOrder);
+    socket?.on("order-status-updated", handleStatusUpdate);
+    socket?.on("delivery-assignment-accepted", handleAssignmentAccepted);
+    return () => {
+      socket?.off("new-Order", handleNewOrder);
+      socket?.off("order-status-updated", handleStatusUpdate);
+      socket?.off("delivery-assignment-accepted", handleAssignmentAccepted);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-[#050510] pt-28 pb-10 px-4 sm:px-8 overflow-x-hidden">
       {/* Background Glows */}
@@ -97,7 +265,7 @@ export default function ManageOrders() {
               Manage <span className="text-blue-500 text-shadow-glow">Orders</span>
             </h1>
             <p className="text-white/40 text-sm font-medium mt-1 uppercase tracking-widest">
-              Live Tracker • {orders.length} total
+              Live Tracker â€¢ {orders.length} total
             </p>
           </div>
 
@@ -139,9 +307,17 @@ export default function ManageOrders() {
                 </thead>
                 <tbody>
                   <AnimatePresence>
-                    {filteredOrders.map((order: any, index) => {
-                      const StatusIcon = statusConfig[order.status || 'pending'].icon;
+                    {filteredOrders.map((order, index) => {
+                      const statusKey: OrderStatus = (order.status ?? "pending") as OrderStatus;
+                      const StatusIcon = statusConfig[statusKey].icon;
                       const randomColor = avatarColors[index % avatarColors.length];
+                      const assignedUser =
+                        typeof order.assignment === "object" &&
+                        order.assignment &&
+                        typeof order.assignment.assignedTo === "object" &&
+                        order.assignment.assignedTo
+                          ? (order.assignment.assignedTo as AssignedUser)
+                          : null;
                       return (
                         <motion.tr 
                           key={order._id}
@@ -164,12 +340,26 @@ export default function ManageOrders() {
                             </div>
                           </td>
                           <td className="p-6">
-                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${statusConfig[order.status || 'pending'].bg} ${statusConfig[order.status || 'pending'].color} border-white/5`}>
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${statusConfig[statusKey].bg} ${statusConfig[statusKey].color} border-white/5`}>
                                <StatusIcon size={14} />
                                <span className="text-[10px] font-black uppercase tracking-wide">{order.status || 'pending'}</span>
                             </div>
+                            {assignedUser && (
+                              <div className="mt-2 space-y-1 text-[10px] font-bold text-white/50">
+                                <div className="flex items-center gap-2">
+                                  <User size={12} className="text-blue-400" />
+                                  <span>{assignedUser.name || "Delivery Partner"}</span>
+                                </div>
+                                {assignedUser.mobile && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone size={12} className="text-blue-400" />
+                                    <span>{assignedUser.mobile}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </td>
-                          <td className="p-6 text-white font-black text-sm italic">₹{order.totalAmount}</td>
+                          <td className="p-6 text-white font-black text-sm italic">â‚¹{order.totalAmount}</td>
                           <td className="p-6">
                             <button 
                               onClick={() => setSelectedOrder(order)}
@@ -255,16 +445,16 @@ export default function ManageOrders() {
                 <div className="space-y-4">
                   <h3 className="text-purple-500 font-black text-[10px] uppercase tracking-widest flex items-center gap-2"><ShoppingBag size={14}/> Manifest</h3>
                   <div className="space-y-3">
-                    {selectedOrder.items?.map((item: any, i: number) => (
+                    {selectedOrder.items?.map((item: OrderItem, i: number) => (
                       <div key={i} className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-center justify-between group">
                         <div className="flex items-center gap-4">
                           <img src={item.image} alt={item.name} className="w-12 h-12 rounded-xl object-cover bg-white/5 border border-white/10 group-hover:scale-110 transition-transform" />
                           <div>
                             <p className="text-white font-black text-xs uppercase tracking-tighter">{item.name}</p>
-                            <p className="text-white/30 text-[10px] font-bold italic">{item.quantity} x ₹{item.price}</p>
+                            <p className="text-white/30 text-[10px] font-bold italic">{item.quantity} x â‚¹{item.price}</p>
                           </div>
                         </div>
-                        <p className="text-blue-400 font-black text-sm italic">₹{Number(item.price) * item.quantity}</p>
+                        <p className="text-blue-400 font-black text-sm italic">â‚¹{Number(item.price) * item.quantity}</p>
                       </div>
                     ))}
                   </div>
@@ -282,7 +472,7 @@ export default function ManageOrders() {
                   </div>
                   <div className="flex justify-between items-end border-t border-white/10 pt-6">
                     <span className="text-white/40 font-black italic uppercase text-xs">Total Payable</span>
-                    <span className="text-white font-black text-4xl tracking-tighter text-shadow-glow">₹{selectedOrder.totalAmount}</span>
+                    <span className="text-white font-black text-4xl tracking-tighter text-shadow-glow">â‚¹{selectedOrder.totalAmount}</span>
                   </div>
                 </div>
 

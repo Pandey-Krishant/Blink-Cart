@@ -1,4 +1,4 @@
-import connectDB from "@/lib/db";
+﻿import connectDB from "@/lib/db";
 import Order from "@/modals/order.model";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -7,8 +7,21 @@ export async function GET(req: NextRequest) {
     try {
         await connectDB();
 
-        // Saare orders find karne ke liye
-        const orders = await Order.find({}).populate("user");
+        // Show COD orders immediately, and only show online orders after payment success
+        const orders = await Order.find({
+            $or: [
+                { paymentMethod: "cod" },
+                { isPaid: true }
+            ]
+        })
+        .populate("user")
+        .populate({
+            path: "assignment",
+            populate: {
+                path: "assignedTo",
+                select: "name mobile"
+            }
+        });
 
         return NextResponse.json(
             orders, 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React from 'react';
 import { motion } from 'framer-motion';
 import { XCircle, RefreshCcw, AlertTriangle, ChevronLeft } from 'lucide-react';
@@ -31,7 +31,7 @@ function CancelPage() {
           Payment <span className="text-red-500">Failed!</span>
         </h1>
         <p className="text-white/60 text-sm leading-relaxed mb-10 font-medium">
-          Arey bro! Lagta hai transaction mein kuch locha ho gaya. Tension mat lo, paise nahi kate honge. 😉
+          Arey bro! Lagta hai transaction mein kuch locha ho gaya. Tension mat lo, paise nahi kate honge. ðŸ˜‰
         </p>
 
         {/* Info Card */}

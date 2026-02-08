@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React from "react";
 import { Heart, Plus, Minus, Zap } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,15 @@ interface IGrocery {
   unit: string;
 }
 
-function Grocerycard({ item }: { item: IGrocery }) {
+function Grocerycard({
+  item,
+  highlight = false,
+  dataSearchMatch = false,
+}: {
+  item: IGrocery;
+  highlight?: boolean;
+  dataSearchMatch?: boolean;
+}) {
   const dispatch = useDispatch<AppDispatch>();
 
   const quantity = useSelector((state: RootState) => {
@@ -25,23 +33,40 @@ function Grocerycard({ item }: { item: IGrocery }) {
   const itemId = item._id as any;
 
   return (
-    <div className="group relative rounded-2xl p-[1px] overflow-hidden w-full max-w-[280px] aspect-square min-h-[300px]">
+    <div
+      data-search-match={dataSearchMatch ? "true" : "false"}
+      className={`group relative rounded-2xl p-[1px] overflow-hidden w-full max-w-[280px] aspect-square min-h-[300px] ${
+        highlight ? "ring-2 ring-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.45)]" : ""
+      }`}
+    >
 
-      {/* 🔥 Neon Border Glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 via-purple-500/30 to-pink-500/40 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-700" />
+      {/* ðŸ”¥ Neon Border Glow */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-br from-blue-500/40 via-purple-500/30 to-pink-500/40 blur-xl transition-all duration-700 ${
+          highlight ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
+      />
 
-      {/* 🌌 Card Body */}
-      <div className="relative z-10 bg-[#0b0b1a]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-4 flex flex-col h-full transition-all duration-500 group-hover:border-blue-500/40">
+      {/* ðŸŒŒ Card Body */}
+      <div
+        className={`relative z-10 bg-[#0b0b1a]/90 backdrop-blur-xl rounded-2xl border p-4 flex flex-col h-full transition-all duration-500 ${
+          highlight ? "border-blue-500/60" : "border-white/10 group-hover:border-blue-500/40"
+        }`}
+      >
 
-        {/* ⚡ Floating Aura */}
-        <div className="absolute -top-24 -right-24 w-56 h-56 bg-blue-600/20 blur-[90px] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700" />
+        {/* âš¡ Floating Aura */}
+        <div
+          className={`absolute -top-24 -right-24 w-56 h-56 bg-blue-600/20 blur-[90px] rounded-full transition-all duration-700 ${
+            highlight ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
+        />
 
-        {/* ❤️ Wishlist */}
+        {/* â¤ï¸ Wishlist */}
         <button className="absolute top-4 right-4 z-20 text-white/20 hover:text-pink-500 transition-all active:scale-125">
           <Heart size={18} fill={quantity > 0 ? "currentColor" : "none"} />
         </button>
 
-        {/* 🖼️ Image */}
+        {/* ðŸ–¼ï¸ Image */}
         <div className="relative w-full aspect-square rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-4 overflow-hidden">
           <img
             src={item.image}
@@ -56,7 +81,7 @@ function Grocerycard({ item }: { item: IGrocery }) {
           )}
         </div>
 
-        {/* 📝 Info */}
+        {/* ðŸ“ Info */}
         <div className="flex flex-col flex-grow">
           <span className="text-[9px] uppercase tracking-widest text-blue-400 font-bold mb-1">
             {item.category}
@@ -70,10 +95,10 @@ function Grocerycard({ item }: { item: IGrocery }) {
             {item.unit}
           </p>
 
-          {/* 💰 Price + CTA */}
+          {/* ðŸ’° Price + CTA */}
           <div className="flex items-center justify-between mt-4">
             <span className="text-xl font-black text-white tracking-tight">
-              ₹{item.price}
+              â‚¹{item.price}
             </span>
 
             {quantity === 0 ? (

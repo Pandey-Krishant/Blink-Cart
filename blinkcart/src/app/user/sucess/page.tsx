@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Truck, ArrowRight, ShoppingBag } from 'lucide-react';
@@ -31,7 +31,7 @@ function SuccessPage() {
           Order <span className="text-blue-500">Confirmed!</span>
         </h1>
         <p className="text-white/60 text-sm leading-relaxed mb-10 font-medium">
-          Bhai, tension mat lo! Tera samaan raste mein hai aur kitchen mein taiyari shuru ho gayi hai. 😉
+          Bhai, tension mat lo! Tera samaan raste mein hai aur kitchen mein taiyari shuru ho gayi hai. ðŸ˜‰
         </p>
 
         {/* Delivery Estimate Card */}
@@ -47,7 +47,7 @@ function SuccessPage() {
 
         {/* Action Buttons */}
         <div className="space-y-4">
-          <Link href="/user/orders" className="block">
+          <Link href="/user/myorder" className="block">
             <button className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black uppercase tracking-[0.15em] flex items-center justify-center gap-3 group transition-all shadow-xl shadow-blue-600/20">
               Track Order <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>

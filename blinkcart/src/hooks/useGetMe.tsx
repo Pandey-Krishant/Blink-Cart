@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { AppDispatch } from '@/redux/store'
 import { setUserData } from '@/redux/userSlice'
@@ -15,7 +15,7 @@ function useGetMe() {
         // console.log(result)
         dispatch(setUserData(result.data))
        } catch (error) {
-        console.log(error)
+        // console.log(error)
        } 
     }
     getMe()

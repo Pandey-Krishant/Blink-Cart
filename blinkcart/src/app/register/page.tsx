@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Registerform from "@/components/Registerform"
 import Welcome from "@/components/Welcome"
