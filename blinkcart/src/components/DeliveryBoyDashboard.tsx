@@ -386,7 +386,7 @@ export default function DeliveryBoyDashboard() {
                                 </p>
                                 <div className="pl-5 border-l border-white/10">
                                   <p className="text-sm text-white/70">{itemsCount} Items in bag</p>
-                                  <p className="text-[10px] text-amber-400 mt-1 uppercase">Delivery Fee: Ã¢â€šÂ¹{deliveryFee}</p>
+                                  <p className="text-[10px] text-amber-400 mt-1 uppercase">Delivery Fee: ₹{deliveryFee}</p>
                                   {/* ðŸ”¥ Showing full Original Order ID for verification */}
                                   <p className="text-[10px] text-white/30 mt-1 uppercase">Order Ref: {originalOrderId}</p>
                                 </div>
