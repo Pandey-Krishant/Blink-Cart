@@ -64,20 +64,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.role = user.role
+        ;(token as any).id = user.id
+        ;(token as any).role = user.role
         // Ensure email and sub are present on the token for server-side lookups
-        token.email = (user as any).email || token.email
-        token.sub = token.id || token.sub
+        ;(token as any).email = (user as any).email || (token as any).email
+        ;(token as any).sub = (token as any).id || (token as any).sub
       }
       return token
     },
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
+        ;(session.user as any).id = (token as any).id as string
         // Ensure email is available on session and role comes from DB in case it was changed after sign-in
-        session.user.email = token.email as string
+        ;(session.user as any).email = (token as any).email as string
         try {
           await connectDB()
           const dbUser = await User.findById(token.id)
