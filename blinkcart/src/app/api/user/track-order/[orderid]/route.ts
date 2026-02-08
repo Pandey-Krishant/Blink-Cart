@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  context: { params?: { orderid?: string } }
+  context: { params: Promise<{ orderid: string }> }
 ) {
   try {
     await connectDb();
@@ -16,15 +16,7 @@ export async function GET(
       return NextResponse.json({ message: "Login required" }, { status: 401 });
     }
 
-    // `context.params` may be a Promise in certain Next.js runtimes â€” unwrap safely
-    let paramsObj: any = context?.params;
-    if (paramsObj && typeof paramsObj.then === "function") {
-      try {
-        paramsObj = await paramsObj;
-      } catch {
-        paramsObj = undefined;
-      }
-    }
+    let paramsObj: any = await context.params;
 
     const orderId =
       paramsObj?.orderid ||
