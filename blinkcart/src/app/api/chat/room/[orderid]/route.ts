@@ -20,7 +20,7 @@ async function resolveOrder(orderId: string) {
 
 export async function GET(
   req: NextRequest,
-  context: { params?: { orderid?: string } }
+  context: { params: Promise<{ orderid: string }> }
 ) {
   try {
     await connectDB();
@@ -29,14 +29,7 @@ export async function GET(
       return NextResponse.json({ message: "Login required" }, { status: 401 });
     }
 
-    let paramsObj: any = context?.params;
-    if (paramsObj && typeof paramsObj.then === "function") {
-      try {
-        paramsObj = await paramsObj;
-      } catch {
-        paramsObj = undefined;
-      }
-    }
+    let paramsObj: any = await context.params;
     const orderId =
       paramsObj?.orderid ||
       req.nextUrl?.pathname?.split("/")?.filter(Boolean)?.pop() ||
