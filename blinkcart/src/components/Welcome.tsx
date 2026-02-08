@@ -18,9 +18,9 @@ const Welcome = ({ nextstep }: propType) => {
     setMounted(true);
   }, []);
 
-  const smoothTransition = { type: "spring", stiffness: 100, damping: 20 };
+  const smoothTransition: any = { type: "spring", stiffness: 100, damping: 20 };
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -31,7 +31,7 @@ const Welcome = ({ nextstep }: propType) => {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { y: 20, opacity: 0 },
     visible: { 
       y: 0, 

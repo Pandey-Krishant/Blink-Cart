@@ -1,8 +1,7 @@
 ﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import mongoose from 'mongoose'
 
 interface IGrocery {
-  _id?: mongoose.Types.ObjectId;
+  _id?: string;
   name: string;
   category: string;
   price: string;
@@ -35,21 +34,21 @@ const cartSlice = createSlice({
         state.cartData.push(action.payload);
     }
 },
-    increment: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
-      const item = state.cartData.find(i => i._id == action.payload)
+    increment: (state, action: PayloadAction<string>) => {
+      const item = state.cartData.find(i => i._id === action.payload)
       if (item) {
         item.quantity = item.quantity + 1
       }
     },
     // ðŸ”¥ Bas ye decrement add kiya hai bro
-    decrement: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
-      const item = state.cartData.find(i => i._id == action.payload)
+    decrement: (state, action: PayloadAction<string>) => {
+      const item = state.cartData.find(i => i._id === action.payload)
       if (item) {
         if (item.quantity > 1) {
           item.quantity = item.quantity - 1
         } else {
           // Agar quantity 1 hai aur minus dabaya, toh cart se nikal do
-          state.cartData = state.cartData.filter(i => i._id != action.payload)
+          state.cartData = state.cartData.filter(i => i._id !== action.payload)
         }
       }
     }

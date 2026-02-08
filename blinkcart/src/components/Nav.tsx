@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import mongoose from "mongoose";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -15,7 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 
 interface IUser {
-  _id: mongoose.Types.ObjectId;
+  _id: string;
   name: string;
   email: string;
   role: "user" | "deliveryBoy" | "admin";

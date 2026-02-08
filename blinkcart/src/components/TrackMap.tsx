@@ -44,16 +44,16 @@ export default function TrackMap({
 
   return (
     <>
-      <MapContainer center={center} zoom={14} className="h-full w-full rounded-3xl">
+      <MapContainer {...({ center, zoom: 14, className: "h-full w-full rounded-3xl" } as any)}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Recenter center={center} />
-        <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} />
+        <Marker {...({ position: [destination.lat, destination.lng], icon: destinationIcon } as any)} />
         {delivery && (
           <>
-            <Marker position={[delivery.lat, delivery.lng]} icon={deliveryIcon} />
+            <Marker {...({ position: [delivery.lat, delivery.lng], icon: deliveryIcon } as any)} />
             {/* show accuracy circle when available */}
             {(delivery as any)?.accuracy ? (
-              <Circle center={[delivery.lat, delivery.lng]} radius={(delivery as any).accuracy} pathOptions={{ color: "#3b82f6", opacity: 0.15 }} />
+              <Circle {...({ center: [delivery.lat, delivery.lng], radius: (delivery as any).accuracy, pathOptions: { color: "#3b82f6", opacity: 0.15 } } as any)} />
             ) : null}
           </>
         )}

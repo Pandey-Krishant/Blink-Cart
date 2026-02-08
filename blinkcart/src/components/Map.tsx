@@ -21,8 +21,8 @@ const icon = L.icon({
 // Normalize different coordinate shapes and guard against swapped lat/lng
 function normalizeCoords(input: any): [number, number] | null {
   if (!input) return null;
-  let lat: number | undefined;
-  let lng: number | undefined;
+  let lat: number = NaN;
+  let lng: number = NaN;
   if (Array.isArray(input) && input.length >= 2) {
     lat = Number(input[0]);
     lng = Number(input[1]);
@@ -233,19 +233,14 @@ export default function Map({ onLocationChange, forcedPosition, enableWatch = tr
 
   return (
     <div className="relative h-full w-full">
-      <MapContainer center={center} zoom={15} className="h-full w-full">
+      <MapContainer {...({ center, zoom: 15, className: "h-full w-full" } as any)}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <SetViewOnClick animateRef={position ?? normalizedForced} />
         {position && (
           <>
-            <Marker
-              position={position}
-              icon={icon}
-              draggable={true}
-              eventHandlers={{ dragend: handleDragEnd }}
-            />
+            <Marker {...({ position, icon, draggable: true, eventHandlers: { dragend: handleDragEnd } } as any)} />
             {accuracyMeters !== null && accuracyMeters > 0 && (
-              <Circle center={position} radius={accuracyMeters} pathOptions={{ color: "#3b82f6", opacity: 0.2 }} />
+              <Circle {...({ center: position, radius: accuracyMeters, pathOptions: { color: "#3b82f6", opacity: 0.2 } } as any)} />
             )}
           </>
         )}
