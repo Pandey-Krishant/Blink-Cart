@@ -137,7 +137,7 @@ export default function LoginForm({ previousstep }: propType) {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
                 <label className="flex items-center gap-2 text-sm font-semibold text-blue-400 ml-1"><Lock size={16} /> Password</label>
-                <Link href="/forgot-password" size={14} className="text-xs text-blue-400 hover:text-blue-300">Forgot?</Link>
+                <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300">Forgot?</Link>
             </div>
             <div className="relative">
               <input value={password} onChange={(e) => setPassword(e.target.value)} type={showpassword ? "text" : "password"} placeholder="Enter password" className="w-full bg-white/[0.05] border border-white/10 rounded-2xl py-4 px-6 text-white outline-none focus:border-blue-500 transition-all" required />
