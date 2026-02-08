@@ -2,7 +2,7 @@
 import emitEventHandler from "@/lib/emitEventHandler";
 import Order from "@/modals/order.model";
 import User from "@/modals/user.model";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 async function enrichAddressCoords(address: any) {
   if (!address) return address;
@@ -31,7 +31,7 @@ async function enrichAddressCoords(address: any) {
   return address;
 }
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const { userId, items, paymentMethod, address, totalAmount, deliveryFee } =
@@ -75,5 +75,5 @@ export async function POST(req: NextResponse) {
       { message: "Error placing order", error: (error as Error).message },
       { status: 500 },
     );
-}
+  }
 }
