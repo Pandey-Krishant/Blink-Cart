@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -77,7 +77,7 @@ const Delivered = () => {
                 Total Payout
               </p>
               <p className="text-3xl font-black text-emerald-400 italic">
-                â‚¹{totalEarnings.toLocaleString()}
+                ₹{totalEarnings.toLocaleString()}
               </p>
             </div>
             <div className="p-4 bg-emerald-500/20 rounded-2xl border border-emerald-500/20">
@@ -171,7 +171,7 @@ const Delivered = () => {
                         Earnings
                       </p>
                       <p className="text-xl font-black text-emerald-400 italic">
-                        â‚¹{item.order?.deliveryFee || 0}
+                        ₹{item.order?.deliveryFee || 0}
                       </p>
                     </div>
                     <button className="p-3 bg-white/5 hover:bg-emerald-500 hover:text-black rounded-xl transition-all border border-white/10 hover:border-emerald-500 shadow-lg shadow-emerald-500/0 hover:shadow-emerald-500/20">

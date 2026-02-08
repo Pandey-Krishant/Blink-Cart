@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -359,7 +359,7 @@ export default function ManageOrders() {
                               </div>
                             )}
                           </td>
-                          <td className="p-6 text-white font-black text-sm italic">â‚¹{order.totalAmount}</td>
+                          <td className="p-6 text-white font-black text-sm italic">₹{order.totalAmount}</td>
                           <td className="p-6">
                             <button 
                               onClick={() => setSelectedOrder(order)}
@@ -451,10 +451,10 @@ export default function ManageOrders() {
                           <img src={item.image} alt={item.name} className="w-12 h-12 rounded-xl object-cover bg-white/5 border border-white/10 group-hover:scale-110 transition-transform" />
                           <div>
                             <p className="text-white font-black text-xs uppercase tracking-tighter">{item.name}</p>
-                            <p className="text-white/30 text-[10px] font-bold italic">{item.quantity} x â‚¹{item.price}</p>
+                            <p className="text-white/30 text-[10px] font-bold italic">{item.quantity} x ₹{item.price}</p>
                           </div>
                         </div>
-                        <p className="text-blue-400 font-black text-sm italic">â‚¹{Number(item.price) * item.quantity}</p>
+                        <p className="text-blue-400 font-black text-sm italic">₹{Number(item.price) * item.quantity}</p>
                       </div>
                     ))}
                   </div>
@@ -472,7 +472,7 @@ export default function ManageOrders() {
                   </div>
                   <div className="flex justify-between items-end border-t border-white/10 pt-6">
                     <span className="text-white/40 font-black italic uppercase text-xs">Total Payable</span>
-                    <span className="text-white font-black text-4xl tracking-tighter text-shadow-glow">â‚¹{selectedOrder.totalAmount}</span>
+                    <span className="text-white font-black text-4xl tracking-tighter text-shadow-glow">₹{selectedOrder.totalAmount}</span>
                   </div>
                 </div>
 

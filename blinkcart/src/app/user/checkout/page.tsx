@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
@@ -365,11 +365,11 @@ function CheckoutPage() {
               </div>
 
               <div className="mt-10 pt-8 border-t border-white/5 space-y-4">
-                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Subtotal</span><span>â‚¹{subtotal}</span></div>
-                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Delivery</span><span>â‚¹{deliveryFee}</span></div>
+                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Subtotal</span><span>₹{subtotal}</span></div>
+                <div className="flex justify-between text-white/40 font-bold text-[10px] uppercase"><span>Delivery</span><span>₹{deliveryFee}</span></div>
                 <div className="flex justify-between items-end pt-4">
                   <span className="text-[10px] font-black text-blue-500 italic uppercase">GRAND TOTAL</span>
-                  <span className="text-3xl font-black tracking-tighter text-white">â‚¹{total}</span>
+                  <span className="text-3xl font-black tracking-tighter text-white">₹{total}</span>
                 </div>
                 
                 <button 

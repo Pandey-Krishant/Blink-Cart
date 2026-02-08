@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '@/redux/store';
@@ -63,7 +63,7 @@ function CartPage() {
                 <div className="ml-6 flex-grow">
                   <h3 className="text-lg font-bold text-white">{item.name}</h3>
                   <p className="text-xs text-white/40 uppercase font-black">{item.unit}</p>
-                  <p className="text-xl font-black text-blue-500 mt-1">â‚¹{item.price}</p>
+                  <p className="text-xl font-black text-blue-500 mt-1">₹{item.price}</p>
                 </div>
 
                 <div className="flex items-center bg-blue-600 rounded-xl p-1 shadow-lg shadow-blue-600/20">
@@ -102,18 +102,18 @@ function CartPage() {
             <div className="space-y-4 text-sm">
               <div className="flex justify-between text-white/60 font-bold uppercase">
                 <span>Subtotal</span>
-                <span className="text-white">â‚¹{itemTotal}</span>
+                <span className="text-white">₹{itemTotal}</span>
               </div>
               <div className="flex justify-between text-white/60 font-bold uppercase">
                 <span>Delivery Partner Fee</span>
-                <span className="text-white">â‚¹{deliveryFee}</span>
+                <span className="text-white">₹{deliveryFee}</span>
               </div>
               
               <hr className="border-white/5 my-4" />
 
               <div className="flex justify-between items-end">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">Total Amount</span>
-                <span className="text-4xl font-black text-white tracking-tighter">â‚¹{totalToPay}</span>
+                <span className="text-4xl font-black text-white tracking-tighter">₹{totalToPay}</span>
               </div>
 
               <button 

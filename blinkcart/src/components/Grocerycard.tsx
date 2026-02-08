@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React from "react";
 import { Heart, Plus, Minus, Zap } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -98,7 +98,7 @@ function Grocerycard({
           {/* ðŸ’° Price + CTA */}
           <div className="flex items-center justify-between mt-4">
             <span className="text-xl font-black text-white tracking-tight">
-              â‚¹{item.price}
+              ₹{item.price}
             </span>
 
             {quantity === 0 ? (

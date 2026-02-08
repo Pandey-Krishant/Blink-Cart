@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -347,7 +347,7 @@ export default function DeliveryBoyDashboard() {
                           {/* ðŸ”¥ DIsplaying synced short ID */}
                           <h3 className="font-bold text-xl tracking-tight">Order #{displayId}</h3>
                           <div className="flex items-center gap-3 mt-1">
-                             <span className="text-emerald-400 text-sm font-bold">â‚¹{totalAmount}</span>
+                             <span className="text-emerald-400 text-sm font-bold">₹{totalAmount}</span>
                              <span className="text-white/20">|</span>
                              <span className="text-amber-400 text-xs font-bold">Fee Ã¢â€šÂ¹{deliveryFee}</span>
                              <span className="text-white/20">|</span>
