@@ -6,16 +6,16 @@ import User from "@/modals/user.model";
 export default async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // 1. "/" KO ADD KARNA COMPULSORY HAI BRO!
+    // 1. "/" aur baki routes ko public rakha hai loop rokne ke liye
     const publicRoutes = [
-  "/", 
-  "/login", 
-  "/register", 
-  "/api/auth", 
-  "/api/user/edit-role-mobile" // Isse add karo!
-];
+        "/", 
+        "/login", 
+        "/register", 
+        "/api/auth", 
+        "/api/user/edit-role-mobile",
+        "/forgot-password"
+    ];
 
-    // Use startsWith for API paths but exact match for home
     const isPublic = publicRoutes.some((path) => 
         path === "/" ? pathname === "/" : pathname.startsWith(path)
     );
@@ -24,21 +24,26 @@ export default async function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // 2. Secret check (Make sure NEXTAUTH_SECRET is set on Vercel)
+    // 2. Auth.js v5 Production Cookies handle karne ke liye update
     let token: any = null;
     try {
         token = await getToken({
             req,
-            secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+            secret: process.env.AUTH_SECRET,
+            // Auth.js v5 production mein __Secure- prefix use karta hai
+            secureCookie: process.env.NODE_ENV === "production",
+            salt: process.env.NODE_ENV === "production" 
+                ? "__Secure-authjs.session-token" 
+                : "authjs.session-token",
         });
     } catch (err) {
         console.error("proxy getToken error:", err);
     }
 
-    // Lightweight debug logging (safe: don't print secrets)
+    // Lightweight debug logging
     try {
-        const cookieHeader = req.headers.get("cookie")?.slice(0, 200) ?? "(no cookie)";
-        console.debug("[proxy] pathname=", pathname, "hasToken=", !!token, "tokenKeys=", token ? Object.keys(token) : null, "cookieSnippet=", cookieHeader);
+        const cookieHeader = req.headers.get("cookie")?.slice(0, 150) ?? "(no cookie)";
+        console.debug(`[proxy] path=${pathname} hasToken=${!!token} cookie=${cookieHeader}`);
     } catch {}
 
     if (!token) {
@@ -47,21 +52,22 @@ export default async function proxy(req: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // Role-based logic. Try to get freshest role from DB using email or id/sub
+    // 3. Role-based logic FRESH DB lookup ke saath
     let role = token?.role as string | undefined;
     try {
         await connectDB();
         const identifier = token?.email || token?.id || token?.sub;
-        let dbUser = null;
         if (identifier) {
-            // Try email first, then _id
-            dbUser = await User.findOne({ $or: [{ email: identifier }, { _id: identifier }] }).select("role");
+            const dbUser = await User.findOne({ 
+                $or: [{ email: identifier }, { _id: identifier }] 
+            }).select("role");
+            if (dbUser?.role) role = dbUser.role;
         }
-        if (dbUser?.role) role = dbUser.role;
     } catch (err) {
         console.error("proxy role DB lookup failed:", err);
     }
 
+    // Authorization checks
     if (pathname.startsWith("/user") && role !== "user" && pathname !== "/user/delivered") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
@@ -76,9 +82,7 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-    // Don't run this proxy for API routes — prevents API responses being
-    // redirected to the login page in production (Vercel).
     matcher: [
-        '/((?!api/|_next/static|_next/image|favicon.ico).*)',
+        '/((?!api/user/stripe/webhook|api/socket/connect|api/socket/updatelocation|_next/static|_next/image|favicon.ico).*)',
     ],
 };

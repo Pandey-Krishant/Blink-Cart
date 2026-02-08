@@ -111,7 +111,7 @@ export default function RegisterForm({ previousstep }: propType) {
             <span className="text-2xl font-bold text-white tracking-tight">BlinkCart</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-          <p className="text-white/40 text-sm italic">Join the fresh revolution.. ðŸƒ</p>
+          <p className="text-white/40 text-sm italic">Join the fresh revolution.. </p>
         </div>
 
         {/* Show Error Message if any */}
