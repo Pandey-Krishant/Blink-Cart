@@ -66,6 +66,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id
         token.role = user.role
+        // Ensure email and sub are present on the token for server-side lookups
+        token.email = (user as any).email || token.email
+        token.sub = token.id || token.sub
       }
       return token
     },
@@ -73,7 +76,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
-        // Ensure role comes from DB in case it was changed after sign-in
+        // Ensure email is available on session and role comes from DB in case it was changed after sign-in
+        session.user.email = token.email as string
         try {
           await connectDB()
           const dbUser = await User.findById(token.id)
