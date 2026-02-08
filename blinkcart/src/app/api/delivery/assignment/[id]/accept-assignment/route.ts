@@ -7,11 +7,11 @@ import emitEventHandler from "@/lib/emitEventHandler";
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await connectDB()
-        const idFromParams = params?.id
+        const { id: idFromParams } = await params
         const idFromQuery = req.nextUrl.searchParams.get("id") || undefined
         const segments = req.nextUrl.pathname.split("/").filter(Boolean)
         const assignmentIndex = segments.findIndex((s) => s === "assignment")

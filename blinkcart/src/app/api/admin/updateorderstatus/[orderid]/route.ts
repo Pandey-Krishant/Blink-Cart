@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 //orderid vhi likhoo jis name se dynamic folder bnaya h..mene orderid se hi folder bnaya h
 export async function POST(
   req: NextRequest,
-  { params }: { params: { orderid: string } },
+  { params }: { params: Promise<{ orderid: string }> },
 ) {
   try {
     await connectDB();
