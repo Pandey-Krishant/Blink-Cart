@@ -6,6 +6,8 @@ import Order from "@/modals/order.model";
 import User from "@/modals/user.model";
 import emitEventHandler from "@/lib/emitEventHandler";
 
+type ObjectIdLike = string | { toString(): string } | null | undefined;
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
@@ -29,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       assignment.assignedTo && String(assignment.assignedTo) === String(deliveryboyId);
     const isInBroadcast =
       Array.isArray(assignment.broadcastTo) &&
-      assignment.broadcastTo.some((id) => String(id) === String(deliveryboyId));
+      assignment.broadcastTo.some((id: ObjectIdLike) => String(id) === String(deliveryboyId));
 
     // allow reject if it's assigned to me or currently broadcasted to me
     if (!isAssignedToMe && !isInBroadcast) {
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // remove this delivery boy from broadcast list so it disappears for them
     if (Array.isArray(assignment.broadcastTo)) {
       assignment.broadcastTo = assignment.broadcastTo.filter(
-        (id) => String(id) !== String(deliveryboyId)
+        (id: ObjectIdLike) => String(id) !== String(deliveryboyId)
       ) as any;
     }
 
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const busyIds = await DeliveryAssignment.find({ assignedTo: { $in: allIds }, status: { $nin: ["broadcasted", "completed"] } }).distinct("assignedTo");
       const busySet = new Set(busyIds.map((b) => String(b)));
       const available = allIds.filter(
-        (id) => !busySet.has(String(id)) && String(id) !== String(deliveryboyId)
+        (id: ObjectIdLike) => !busySet.has(String(id)) && String(id) !== String(deliveryboyId)
       );
       assignment.broadcastTo = available as any;
     }
