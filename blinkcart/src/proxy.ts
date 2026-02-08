@@ -24,11 +24,16 @@ export default async function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // 2. Secret check (Make sure NEXTAUTH_SECRET is in Vercel)
-    const token = await getToken({ 
-        req, 
-        secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET 
-    });
+    // 2. Secret check (Make sure NEXTAUTH_SECRET is set on Vercel)
+    let token: any = null;
+    try {
+        token = await getToken({
+            req,
+            secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+        });
+    } catch (err) {
+        console.error("proxy getToken error:", err);
+    }
 
     if (!token) {
         const loginUrl = new URL("/login", req.url);
@@ -36,11 +41,16 @@ export default async function proxy(req: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // Role-based logic
-    let role = (token as any).role;
+    // Role-based logic. Try to get freshest role from DB using email or id/sub
+    let role = token?.role as string | undefined;
     try {
         await connectDB();
-        const dbUser = (token as any)?.email ? await User.findOne({ email: (token as any).email }).select("role") : null;
+        const identifier = token?.email || token?.id || token?.sub;
+        let dbUser = null;
+        if (identifier) {
+            // Try email first, then _id
+            dbUser = await User.findOne({ $or: [{ email: identifier }, { _id: identifier }] }).select("role");
+        }
         if (dbUser?.role) role = dbUser.role;
     } catch (err) {
         console.error("proxy role DB lookup failed:", err);
