@@ -35,6 +35,12 @@ export default async function proxy(req: NextRequest) {
         console.error("proxy getToken error:", err);
     }
 
+    // Lightweight debug logging (safe: don't print secrets)
+    try {
+        const cookieHeader = req.headers.get("cookie")?.slice(0, 200) ?? "(no cookie)";
+        console.debug("[proxy] pathname=", pathname, "hasToken=", !!token, "tokenKeys=", token ? Object.keys(token) : null, "cookieSnippet=", cookieHeader);
+    } catch {}
+
     if (!token) {
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("callbackUrl", req.url);
