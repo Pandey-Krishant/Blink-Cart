@@ -7,7 +7,13 @@ export default async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // 1. "/" KO ADD KARNA COMPULSORY HAI BRO!
-    const publicRoutes = ["/", "/login", "/register", "/api/auth", "/api/socket/connect", "/api/socket/updatelocation"];
+    const publicRoutes = [
+  "/", 
+  "/login", 
+  "/register", 
+  "/api/auth", 
+  "/api/user/edit-role-mobile" // Isse add karo!
+];
 
     // Use startsWith for API paths but exact match for home
     const isPublic = publicRoutes.some((path) => 
