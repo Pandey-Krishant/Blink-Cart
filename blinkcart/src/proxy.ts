@@ -70,7 +70,9 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
+    // Don't run this proxy for API routes — prevents API responses being
+    // redirected to the login page in production (Vercel).
     matcher: [
-        '/((?!api/user/stripe/webhook|api/socket/connect|api/socket/updatelocation|_next/static|_next/image|favicon.ico).*)',
+        '/((?!api/|_next/static|_next/image|favicon.ico).*)',
     ],
 };
